@@ -33,19 +33,20 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()) {
     val data = viewModel.airQualityData.collectAsState()
-
+    val no2: Double? = data.value?.components?.get("no2")
+    Hello(no2)
 }
 
 @Composable
-fun Hello() {
+fun Hello(no2: Double?) {
     Text(
-        "Hello, AirQualityApp!"
+        "NO2: $no2"
     )
 }
 @Preview(showBackground = true)
 @Composable
 fun HelloPreview() {
     AirQualityAppTheme {
-        Hello()
+        Hello(10.0)
     }
 }
