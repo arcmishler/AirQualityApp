@@ -21,7 +21,7 @@ class AirQualityViewModel @Inject constructor(
     private var _airQualityData = MutableStateFlow<AirQuality?>(null)
     val airQualityData: StateFlow<AirQuality?> = _airQualityData
 
-    fun getAirQualityData(lat: Double, lon: Double) {
+    fun fetchAirQuality(lat: Double, lon: Double) {
         viewModelScope.launch {
             try {
                 val response = airPollutionApi.getAirPollutionData(lat, lon, apiKey)
@@ -30,6 +30,7 @@ class AirQualityViewModel @Inject constructor(
                     val airQualityList: List<AirQuality>? = airPollutionResponse?.airQualityList
                     val airQuality: AirQuality? = airQualityList?.get(0) // Assuming there's only one item in the list
                     _airQualityData.value = airQuality
+                    Log.d("AirQuality:", "$airQuality")
                 }
             } catch (e: Exception) {
                 Log.e("ViewModel", "Error with API call: ", e)
