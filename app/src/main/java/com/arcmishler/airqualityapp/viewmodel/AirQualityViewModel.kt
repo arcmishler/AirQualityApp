@@ -25,6 +25,7 @@ class AirQualityViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = airPollutionApi.getAirPollutionData(lat, lon, apiKey)
+                Log.d("Response", response.toString())
                 if (response.isSuccessful) {
                     val airPollutionResponse: AirPollutionResponse? = response.body()
                     val airQualityList: List<AirQuality>? = airPollutionResponse?.airQualityList

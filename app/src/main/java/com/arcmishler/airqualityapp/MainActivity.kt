@@ -6,11 +6,17 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -114,12 +120,33 @@ fun AirScreen(
 //                AirQualityCard(component = component, value = value)
 //            }
         }
-        AirQualityCard(component = "NO2", value = 10.0)
-        AirQualityCard(component = "PM2.5", value = 2.1)
-        aqData.value?.components?.forEach {(c, v) ->
-            AirQualityCard(component = c, value = v)
+        val airQuality by viewModel.airQualityData.collectAsState()
+        if (airQuality == null) {
+            EmptyAirQuality()
+        } else {
+            airQuality?.let {
+                    data ->
+                LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                    items(data.components.entries.toList()) { (component, value) ->
+                        AirQualityCard(component = component, value = value)
+                    }
+                }
+            }
         }
+    }
+}
 
+@Composable
+fun EmptyAirQuality() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize(Alignment.Center)
+    ) {
+        Text(modifier = Modifier
+            .align(Alignment.Center),
+            text = "No air quality data available.\n" +
+                "Try searching for your location.")
     }
 }
 
@@ -128,7 +155,8 @@ fun AirScreen(
 fun AirQualityCard(component: String, value: Double) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(8.dp),
+
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
