@@ -9,7 +9,7 @@ import java.io.File
 
 
 object APIClient {
-    private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
+    private const val BASE_URL = "https://api.openweathermap.org/"
     private const val CACHE_SIZE = 10 * 1024 * 1024
 
     fun createAirPollutionAPIService(applicationContext: Context): AirPollutionAPIService {
@@ -25,6 +25,18 @@ object APIClient {
             .create(AirPollutionAPIService::class.java)
     }
 
+    fun createGeoCodingAPIService(applicationContext: Context): GeoCodingAPIService {
+        val okHttpClient = OkHttpClient.Builder()
+            .cache(createCache(applicationContext))
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(GeoCodingAPIService::class.java)
+    }
     private fun createCache(applicationContext: Context): Cache {
         return Cache(
             File(applicationContext.cacheDir, "api_cache"),

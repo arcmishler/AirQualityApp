@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface AirPollutionAPIService {
-    @GET("air_pollution")
+    @GET("data/2.5/air_pollution")
     suspend fun getAirPollutionData(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,

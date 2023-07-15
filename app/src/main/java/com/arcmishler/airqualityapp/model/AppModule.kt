@@ -1,6 +1,7 @@
 package com.arcmishler.airqualityapp.model
 
 import com.arcmishler.airqualityapp.api.AirPollutionAPIService
+import com.arcmishler.airqualityapp.api.GeoCodingAPIService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,16 +24,16 @@ object AppModule {
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.openweathermap.org/data/2.5/")
+            .baseUrl("https://api.openweathermap.org/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-//
-//    @Provides
-//    fun provideGeoCodingApiService(retrofit: Retrofit): GeoCodingApiService {
-//        return retrofit.create(GeoCodingApiService::class.java)
-//    }
+
+    @Provides
+    fun provideGeoCodingApiService(retrofit: Retrofit): GeoCodingAPIService {
+        return retrofit.create(GeoCodingAPIService::class.java)
+    }
 
     @Provides
     fun provideAirPollutionApiService(retrofit: Retrofit): AirPollutionAPIService {
