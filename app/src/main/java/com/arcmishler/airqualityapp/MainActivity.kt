@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,11 +19,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButtonDefaults.elevation
 import androidx.compose.material3.Icon
@@ -39,6 +43,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -91,8 +97,6 @@ fun AirScreen(
                 active = false
                 if (searchText.isNotEmpty()) {
                     val location = parseSearch(searchText)
-                    Log.d("Location1", location[0])
-                    Log.d("Location2", location[1])
                     viewModel.fetchAirQuality(location[0].toDouble(), location[1].toDouble())
                 }
             },
@@ -120,6 +124,7 @@ fun AirScreen(
 //                AirQualityCard(component = component, value = value)
 //            }
         }
+        LocationHeader()
         val airQuality by viewModel.airQualityData.collectAsState()
         if (airQuality == null) {
             EmptyAirQuality()
@@ -136,6 +141,22 @@ fun AirScreen(
     }
 }
 
+@Composable
+fun LocationHeader() {
+    Card(modifier = Modifier
+        .padding(16.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
+        elevation = CardDefaults.cardElevation(10.dp)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Air quality in...", style = MaterialTheme.typography.bodySmall)
+            Text("Location", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+        }
+    }
+}
 @Composable
 fun EmptyAirQuality() {
     Box(
@@ -155,13 +176,15 @@ fun EmptyAirQuality() {
 fun AirQualityCard(component: String, value: Double) {
     Card(
         modifier = Modifier
-            .padding(8.dp),
-
+            .padding(8.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.LightGray)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.aligned(Alignment.CenterVertically)
         ) {
             Text(
                 component,
