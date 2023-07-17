@@ -2,7 +2,7 @@ package com.arcmishler.airqualityapp.model
 
 import com.google.gson.annotations.SerializedName
 
-data class GeoCodingResponse(
+data class GeoCodeResponse(
     @SerializedName("zip") val zip: Int,
     @SerializedName("name") val name: String,
     @SerializedName("lat") val lat: Double,
