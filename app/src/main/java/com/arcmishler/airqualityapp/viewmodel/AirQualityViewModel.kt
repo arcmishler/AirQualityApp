@@ -34,6 +34,9 @@ class AirQualityViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     val geoCodeResponse: GeoCodeResponse? = response.body()
                     _geoCodeData.value = geoCodeResponse
+                    geoCodeResponse?.let {
+                        fetchAirQuality(it.lat, it.lon)
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("ViewModel", "Error with GeoCode call: ", e)

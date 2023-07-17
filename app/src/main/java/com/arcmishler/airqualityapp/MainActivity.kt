@@ -84,6 +84,7 @@ fun AirScreen(
     viewModel: AirQualityViewModel
 ) {
     val aqData = viewModel.airQualityData.collectAsState()
+    val gcData = viewModel.geoCodeData.collectAsState()
     var active by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
@@ -96,13 +97,13 @@ fun AirScreen(
             onSearch = {
                 active = false
                 if (searchText.isNotEmpty()) {
-                    val location = parseSearch(searchText)
-                    viewModel.fetchAirQuality(location[0].toDouble(), location[1].toDouble())
+                    // TODO: Input validation
+                    viewModel.fetchGeoCode(searchText)
                 }
             },
             active = active, onActiveChange = { active = it },
             placeholder = {
-                Text("zipcode or city/state")
+                Text("Enter zipcode")
             },
             leadingIcon = {
                 Icon(imageVector = Icons.Default.Search, contentDescription = "Search icon")
@@ -119,12 +120,8 @@ fun AirScreen(
                 }
             }
         ) {
-//            aqData.value?.components?.forEach { (component, value) ->
-//                Log.d("Component", component)
-//                AirQualityCard(component = component, value = value)
-//            }
         }
-        LocationHeader()
+        LocationHeader(gcData.value?.name)
         val airQuality by viewModel.airQualityData.collectAsState()
         if (airQuality == null) {
             EmptyAirQuality()
@@ -142,7 +139,7 @@ fun AirScreen(
 }
 
 @Composable
-fun LocationHeader() {
+fun LocationHeader(location: String?) {
     Card(modifier = Modifier
         .padding(16.dp),
         shape = RoundedCornerShape(24.dp),
@@ -153,7 +150,8 @@ fun LocationHeader() {
             .padding(top = 16.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Air quality in...", style = MaterialTheme.typography.bodySmall)
-            Text("Location", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+            Text(location ?: "Awaiting location", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+
         }
     }
 }
