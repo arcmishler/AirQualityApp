@@ -1,38 +1,33 @@
 package com.arcmishler.airqualityapp
-
+import com.arcmishler.airqualityapp.ui.theme.*
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButtonDefaults.elevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,7 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -126,6 +121,8 @@ fun AirScreen(
         if (airQuality == null) {
             EmptyAirQuality()
         } else {
+            AqiIndicator(aqi = airQuality!!.main.aqi)
+            AirQualityCard(component = "AQI", value = airQuality!!.main.aqi.toDouble())
             airQuality?.let {
                     data ->
                 LazyVerticalGrid(columns = GridCells.Fixed(2)) {
@@ -169,6 +166,36 @@ fun EmptyAirQuality() {
     }
 }
 
+@Composable
+fun AqiIndicator(aqi: Int) {
+    val aqiColor = getAQIColor(aqi)
+    val aqiPercentage = aqi * .001
+    CircularProgressIndicator(
+        modifier = Modifier
+            .size(150.dp)
+            .rotate(270f),
+        progress = aqiPercentage.toFloat(),
+        color = aqiColor,
+        strokeWidth = 50.dp)
+}
+
+@Preview
+@Composable
+fun AQIPreview() { 
+    val aqi: Int = 37
+    AqiIndicator(aqi = aqi)
+}
+fun getAQIColor(aqi: Int): Color {
+    return when (aqi) {
+        in 0..50 -> AirGreen
+        in 51..100 -> AirYellow
+        in 101..150 -> AirOrange
+        in 151..200 -> AirRed
+        in 201..300 -> AirPurple
+        in 301..500 -> AirMaroon
+        else -> {Color.Black}
+    }
+}
 
 @Composable
 fun AirQualityCard(component: String, value: Double) {

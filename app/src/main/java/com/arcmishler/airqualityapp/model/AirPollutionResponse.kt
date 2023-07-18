@@ -7,6 +7,10 @@ data class AirPollutionResponse(
 )
 
 data class AirQuality(
-    @SerializedName("aqi") val aqi: Int,
+    @SerializedName("main") val main: MainData,
     @SerializedName("components") val components: Map<String, Double>
+)
+
+data class MainData(
+    @SerializedName("aqi") val aqi: Int
 )
