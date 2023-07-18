@@ -9,7 +9,8 @@ import java.io.File
 
 
 object APIClient {
-    private const val BASE_URL = "https://api.openweathermap.org/"
+    private const val BASE_URL_OWM = "https://api.openweathermap.org/"
+    private const val BASE_URL_NINJA = "https://api.api-ninjas.com/"
     private const val CACHE_SIZE = 10 * 1024 * 1024
 
     fun createAirPollutionAPIService(applicationContext: Context): AirPollutionAPIService {
@@ -18,7 +19,7 @@ object APIClient {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BASE_URL_OWM)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -31,11 +32,24 @@ object APIClient {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BASE_URL_OWM)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(GeoCodingAPIService::class.java)
+    }
+
+    fun createAqiAPIService(applicationContext: Context): AqiAPIService {
+        val okHttpClient = OkHttpClient.Builder()
+            .cache(createCache(applicationContext))
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL_NINJA)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(AqiAPIService::class.java)
     }
     private fun createCache(applicationContext: Context): Cache {
         return Cache(

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,9 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -40,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -80,10 +84,13 @@ fun AirScreen(
 ) {
     val aqData = viewModel.airQualityData.collectAsState()
     val gcData = viewModel.geoCodeData.collectAsState()
+    val airPollution by viewModel.airQualityData.collectAsState()
+    val airQuality by viewModel.aqiData.collectAsState()
     var active by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SearchBar(
             modifier = Modifier.fillMaxWidth(),
@@ -116,14 +123,44 @@ fun AirScreen(
             }
         ) {
         }
-        LocationHeader(gcData.value?.name)
-        val airQuality by viewModel.airQualityData.collectAsState()
-        if (airQuality == null) {
+
+
+        if (airPollution == null) {
             EmptyAirQuality()
         } else {
-            AqiIndicator(aqi = airQuality!!.main.aqi)
-            AirQualityCard(component = "AQI", value = airQuality!!.main.aqi.toDouble())
-            airQuality?.let {
+            Box(modifier = Modifier
+                .height(250.dp)
+                .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Canvas(modifier = Modifier.size(73.dp), onDraw = {
+                    drawCircle(color = getAQIColor(airQuality?.overallAqi), style = Stroke(12f))
+
+                })
+                Canvas(modifier = Modifier
+                    .size(209.dp), onDraw = {
+                    val startAngle = (270 - 230 / 2).toFloat()
+                    drawArc(
+                        color = Color.Black,
+                        startAngle = startAngle,
+                        sweepAngle = 230f,
+                        useCenter = false,
+                        style = Stroke(30f)
+                    )
+                })
+                AqiIndicator(aqi = airQuality?.overallAqi)
+                Column(modifier = Modifier
+                    .fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy((-8).dp, Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("AQI", style = MaterialTheme.typography.bodyLarge)
+                    Text(airQuality?.overallAqi.toString(), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                }
+
+            }
+            LocationHeader(gcData.value?.name)
+            airPollution?.let {
                     data ->
                 LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                     items(data.components.entries.toList()) { (component, value) ->
@@ -138,16 +175,17 @@ fun AirScreen(
 @Composable
 fun LocationHeader(location: String?) {
     Card(modifier = Modifier
-        .padding(16.dp),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
+        .padding(16.dp)
+        .offset(y = (-80).dp),
+        shape = RoundedCornerShape(35.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
         elevation = CardDefaults.cardElevation(10.dp)) {
         Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp, bottom = 16.dp),
+            .wrapContentSize()
+            .padding(top = 8.dp, bottom = 8.dp, start = 30.dp, end = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Air quality in...", style = MaterialTheme.typography.bodySmall)
-            Text(location ?: "Awaiting location", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+            Text(location ?: "Awaiting location", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
 
         }
     }
@@ -166,26 +204,29 @@ fun EmptyAirQuality() {
     }
 }
 
+
 @Composable
-fun AqiIndicator(aqi: Int) {
+fun AqiIndicator(aqi: Int?) {
     val aqiColor = getAQIColor(aqi)
-    val aqiPercentage = aqi * .001
-    CircularProgressIndicator(
-        modifier = Modifier
-            .size(150.dp)
-            .rotate(270f),
-        progress = aqiPercentage.toFloat(),
-        color = aqiColor,
-        strokeWidth = 50.dp)
+    val aqiArc = aqi?.times((.002 * 230/360))
+    if (aqiArc != null) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .size(220.dp)
+                .rotate(245f),
+            progress = aqiArc.toFloat(),
+            color = aqiColor,
+            strokeWidth = 75.dp)
+    }
 }
 
 @Preview
 @Composable
 fun AQIPreview() { 
-    val aqi: Int = 37
+    val aqi: Int = 500
     AqiIndicator(aqi = aqi)
 }
-fun getAQIColor(aqi: Int): Color {
+fun getAQIColor(aqi: Int?): Color {
     return when (aqi) {
         in 0..50 -> AirGreen
         in 51..100 -> AirYellow
