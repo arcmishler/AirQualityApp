@@ -12,6 +12,7 @@ import com.arcmishler.airqualityapp.model.AqiResponse
 import com.arcmishler.airqualityapp.model.GeoCodeResponse
 import com.arcmishler.airqualityapp.model.Pollutant
 import com.arcmishler.airqualityapp.model.PollutantRanges
+import com.arcmishler.airqualityapp.model.PollutantType
 import com.arcmishler.airqualityapp.model.filterComponents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +55,7 @@ class AirQualityViewModel @Inject constructor(
             }
         }
     }
-    fun fetchPollutants(lat: Double, lon: Double) {
+    private fun fetchPollutants(lat: Double, lon: Double) {
         viewModelScope.launch {
             try {
                 val response = airPollutionApi.getAirPollutionData(lat, lon, apiKey)
@@ -65,11 +66,11 @@ class AirQualityViewModel @Inject constructor(
                     airQuality?.let {
                         val filteredComponents = filterComponents(it.components)
                         val pollutants = filteredComponents.map { (component, value) ->
-                            val pollutantLevels = PollutantRanges().getColorRange(component)
-                            Pollutant(component, value, pollutantLevels)
+                            val pollutantType = PollutantType.valueOf(component.uppercase())
+                            Pollutant(pollutantType, value)
                         }
                         // Now, you can use the list of pollutants as needed
-                        // For example, you can store it in _airQualityData
+                        // For example, you can store it in _pollutantList
                         _pollutantList.value = pollutants
                     }
                 }
@@ -80,7 +81,8 @@ class AirQualityViewModel @Inject constructor(
     }
 
 
-    fun fetchAQI(lat: Double, lon: Double) {
+
+    private fun fetchAQI(lat: Double, lon: Double) {
         viewModelScope.launch {
             try {
                 val response = aqiAPI.getAqiData(lat, lon, apiNinjaKey)
