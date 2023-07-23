@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -54,6 +55,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -147,7 +149,8 @@ fun AirScreen(
                     .fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    AQIColorChart(aqi = airQuality?.overallAqi?.toFloat())
+                    AQIColorChart(aqi = airQuality?.overallAqi)
+                    AQIGauge(aqi = airQuality?.overallAqi)
                     AQIText(aqi = airQuality?.overallAqi.toString())
                 }
                 LocationHeader(gcData.value?.name)
@@ -208,9 +211,9 @@ fun AQIText(aqi: String) {
 }
 
 @Composable
-fun AQIColorChart(aqi: Float?) {
+fun AQIColorChart(aqi: Int?) {
     val colors: List<Color> = listOf(AirGreen, AirYellow, AirOrange, AirRed, AirPurple, AirMaroon)
-    var aqiArc: Float = 0f
+
     Canvas(modifier = Modifier
         .size(150.dp), onDraw = {
         for ((i, color) in colors.withIndex()) {
@@ -221,9 +224,22 @@ fun AQIColorChart(aqi: Float?) {
                 startAngle = startAngle,
                 sweepAngle = sweepAngle,
                 useCenter = false,
-                style = Stroke(60f)
+                style = Stroke(75f)
             )
         }
+
+
+    })
+
+}
+
+@Composable
+fun AQIGauge(aqi: Int?) {
+    var aqiArc: Float = 0f
+    Canvas(modifier = Modifier
+        .size(150.dp), onDraw = {
+        val pointA = Offset(size.width / 5, size.height / 2)
+        val pointB = Offset(0f, size.height / 2)
         if (aqi != null && aqi >= 300 ) {
             aqiArc = (aqi - 300) * (45f/200) + 225
         } else if (aqi != null && aqi >= 200) {
@@ -231,22 +247,33 @@ fun AQIColorChart(aqi: Float?) {
         } else if (aqi != null) {
             aqiArc = aqi * (180f/200)
         }
-        drawArc(
+        drawCircle(
+            radius = 120f,
             color = Color.Black,
-            startAngle = 135f,
-            sweepAngle = aqiArc,
-            useCenter = false,
-            style = Stroke(10f, cap = StrokeCap.Round),
+            style = Stroke(15f)
         )
-
+        rotate(aqiArc - 45f) {
+            drawLine(
+                color = Color.Black,
+                strokeWidth = 15f,
+                cap = StrokeCap.Round,
+                start = pointA,
+                end = pointB)
+        }
     })
+}
 
+@Preview
+@Composable
+fun AQIMeterPreview() {
+    val aqi: Int = 150
+    AQIGauge(aqi)
 }
 
 @Preview
 @Composable
 fun AQIPreview() { 
-    val aqi: Float = 150f
+    val aqi: Int = 150
     AQIColorChart(aqi)
 }
 fun getAQIColor(aqi: Int?): Color {
@@ -276,7 +303,7 @@ fun AirQualityCard(component: String, value: Double) {
             verticalArrangement = Arrangement.aligned(Alignment.CenterVertically)
         ) {
             Text(
-                component,
+                component.uppercase(),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold
             )
