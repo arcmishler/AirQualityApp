@@ -3,7 +3,7 @@ package com.arcmishler.airqualityapp.model
 data class Pollutant(
     val name: String,
     val value: Double,
-    val aqRange: PollutantLevels
+    val aqRange: PollutantLevels?
 )
 
 data class PollutantLevels (

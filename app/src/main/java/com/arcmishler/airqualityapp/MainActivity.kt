@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -29,6 +31,7 @@ import androidx.compose.material.icons.outlined.North
 import androidx.compose.material.icons.outlined.SwipeUpAlt
 import androidx.compose.material.icons.rounded.SwipeUp
 import androidx.compose.material.icons.rounded.SwipeUpAlt
+import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -59,10 +62,13 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.arcmishler.airqualityapp.model.Pollutant
+import com.arcmishler.airqualityapp.model.PollutantLevels
 import com.arcmishler.airqualityapp.ui.theme.AirQualityAppTheme
 import com.arcmishler.airqualityapp.viewmodel.AirQualityViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -81,8 +87,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()) {
-    val data = viewModel.airQualityData.collectAsState()
-    val no2: Double? = data.value?.components?.get("no2")
+    val data = viewModel.pollutantList.collectAsState()
     val (searchText, setSearchText) = remember { mutableStateOf("") }
 
     AirScreen(searchText, setSearchText, viewModel)
@@ -96,9 +101,9 @@ fun AirScreen(
     onSearchTextChange: (String) -> Unit,
     viewModel: AirQualityViewModel
 ) {
-    val aqData = viewModel.airQualityData.collectAsState()
+    val aqData = viewModel.pollutantList.collectAsState()
     val gcData = viewModel.geoCodeData.collectAsState()
-    val airPollution by viewModel.airQualityData.collectAsState()
+    val pollutants by viewModel.pollutantList.collectAsState()
     val airQuality by viewModel.aqiData.collectAsState()
     var active by remember { mutableStateOf(false) }
     Column(
@@ -137,7 +142,7 @@ fun AirScreen(
             }
         ) {
         }
-        if (airPollution == null) {
+        if (pollutants == null) {
             EmptyAirQuality()
         } else {
             Column(
@@ -154,16 +159,12 @@ fun AirScreen(
                     AQIText(aqi = airQuality?.overallAqi.toString())
                 }
                 LocationHeader(gcData.value?.name)
-                airPollution?.let {
-                        data ->
-                    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                        items(data.components.entries.toList()) { (component, value) ->
-                            AirQualityCard(component = component, value = value)
-                        }
+                LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                    items(pollutants!!) { pollutant ->
+                        AirQualityCard(pollutant)
                     }
                 }
             }
-
         }
     }
 }
@@ -262,20 +263,20 @@ fun AQIGauge(aqi: Int?) {
         }
     })
 }
-
-@Preview
-@Composable
-fun AQIMeterPreview() {
-    val aqi: Int = 150
-    AQIGauge(aqi)
-}
-
-@Preview
-@Composable
-fun AQIPreview() { 
-    val aqi: Int = 150
-    AQIColorChart(aqi)
-}
+//
+//@Preview
+//@Composable
+//fun AQIMeterPreview() {
+//    val aqi: Int = 150
+//    AQIGauge(aqi)
+//}
+//
+//@Preview
+//@Composable
+//fun AQIPreview() {
+//    val aqi: Int = 150
+//    AQIColorChart(aqi)
+//}
 fun getAQIColor(aqi: Int?): Color {
     return when (aqi) {
         in 0..50 -> AirGreen
@@ -289,26 +290,27 @@ fun getAQIColor(aqi: Int?): Color {
 }
 
 @Composable
-fun AirQualityCard(component: String, value: Double) {
+fun AirQualityCard(pollutant: Pollutant) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
+            .wrapContentSize(),
+        shape = RoundedCornerShape(48.dp),
         colors = CardDefaults.cardColors(containerColor = Color.LightGray)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp)
+                .requiredSize(100.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.aligned(Alignment.CenterVertically)
         ) {
             Text(
-                component.uppercase(),
+                pollutant.name.uppercase(),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(8.dp))
-            Text("$value", fontSize = 24.sp)
+            Text("${pollutant.value}", fontSize = 24.sp)
         }
     }
 }
@@ -320,7 +322,18 @@ fun parseSearch(text: String): List<String> {
 @Preview(showBackground = true)
 @Composable
 fun AirQualityCardPreview() {
+    val level = PollutantLevels(
+        0..40,
+        41..70,
+        71..150,
+        151..200,
+        201..350,
+        351..800
+    )
+    val fakePollutant = Pollutant(
+        "NO2", 45.toDouble(), level
+    )
     AirQualityAppTheme {
-        AirQualityCard("NO2", 10.0)
+        AirQualityCard(fakePollutant)
     }
 }
