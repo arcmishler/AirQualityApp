@@ -39,7 +39,7 @@ object APIClient {
             .create(GeoCodingAPIService::class.java)
     }
 
-    fun createAqiAPIService(applicationContext: Context): AqiAPIService {
+    fun createAirQualityAPIService(applicationContext: Context): AirQualityAPIService {
         val okHttpClient = OkHttpClient.Builder()
             .cache(createCache(applicationContext))
             .build()
@@ -49,7 +49,7 @@ object APIClient {
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(AqiAPIService::class.java)
+            .create(AirQualityAPIService::class.java)
     }
     private fun createCache(applicationContext: Context): Cache {
         return Cache(

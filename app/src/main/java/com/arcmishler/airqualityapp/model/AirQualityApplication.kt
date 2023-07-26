@@ -11,5 +11,6 @@ class AirQualityApplication: Application() {
 
         val airPollutionAPIService = APIClient.createAirPollutionAPIService(applicationContext)
         val geoCodingAPIService = APIClient.createGeoCodingAPIService(applicationContext)
+        val airQualityAPIService = APIClient.createAirQualityAPIService(applicationContext)
     }
 }

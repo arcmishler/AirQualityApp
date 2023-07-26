@@ -60,7 +60,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.arcmishler.airqualityapp.model.AqiResponse
 import com.arcmishler.airqualityapp.model.GeoCodeResponse
 import com.arcmishler.airqualityapp.model.Pollutant
 import com.arcmishler.airqualityapp.model.PollutantType
@@ -97,7 +96,7 @@ fun AirScreen(
     searchText: String,
     onSearchTextChange: (String) -> Unit,
     pollutants: List<Pollutant>?,
-    airQuality: AqiResponse?,
+    airQuality: Int?,
     gcData: GeoCodeResponse?,
     viewModel: AirQualityViewModel
 ) {
@@ -174,16 +173,16 @@ fun AirScreen(
 }
 
 @Composable
-fun AQIDisplay(airQuality: AqiResponse?) {
+fun AQIDisplay(airQuality: Int?) {
     Box(modifier = Modifier
         .height(160.dp)
         .offset(y = 10.dp)
         .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        AQIColorChart(aqi = airQuality?.overallAqi)
-        AQIGauge(aqi = airQuality?.overallAqi)
-        AQIText(aqi = airQuality?.overallAqi.toString())
+        AQIColorChart(aqi = airQuality)
+        AQIGauge(aqi = airQuality)
+        AQIText(aqi = airQuality.toString())
     }
 }
 
@@ -354,7 +353,7 @@ fun AirQualityCard(pollutant: Pollutant) {
             verticalArrangement = Arrangement.aligned(Alignment.CenterVertically)
         ) {
             when (pollutant.type) {
-                PollutantType.PM2_5 -> {
+                PollutantType.PM25 -> {
                     Text(fontSize = 22.sp,
                         color = Color.White,
                         text = buildAnnotatedString {

@@ -1,6 +1,7 @@
 package com.arcmishler.airqualityapp.model
 
 import com.arcmishler.airqualityapp.api.AirPollutionAPIService
+import com.arcmishler.airqualityapp.api.AirQualityAPIService
 import com.arcmishler.airqualityapp.api.AqiAPIService
 import com.arcmishler.airqualityapp.api.GeoCodingAPIService
 import dagger.Module
@@ -63,6 +64,13 @@ object AppModule {
     ): AqiAPIService {
         return retrofit.create(AqiAPIService::class.java)
     }
+    @Provides
+    fun provideAirQualityAPIService(
+        @BaseUrlApiNinjas retrofit: Retrofit
+    ): AirQualityAPIService {
+        return retrofit.create(AirQualityAPIService::class.java)
+    }
+
 }
 
 @Qualifier
