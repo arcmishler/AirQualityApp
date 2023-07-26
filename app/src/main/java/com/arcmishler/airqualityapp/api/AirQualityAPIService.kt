@@ -1,7 +1,6 @@
 package com.arcmishler.airqualityapp.api
 
 import com.arcmishler.airqualityapp.model.AirQualityResponse
-import com.arcmishler.airqualityapp.model.AqiResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header

@@ -180,9 +180,9 @@ fun AQIDisplay(airQuality: Int?) {
         .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        AQIColorChart(aqi = airQuality)
-        AQIGauge(aqi = airQuality)
-        AQIText(aqi = airQuality.toString())
+        AQIColorChart()
+        AQIGauge(airQuality)
+        AQIText(airQuality.toString())
     }
 }
 
@@ -247,7 +247,7 @@ fun AQIText(aqi: String) {
 }
 
 @Composable
-fun AQIColorChart(aqi: Int?) {
+fun AQIColorChart() {
     val colors: List<Color> = listOf(AirGreen, AirYellow, AirOrange, AirRed, AirPurple, AirMaroon)
 
     Canvas(modifier = Modifier

@@ -3,19 +3,12 @@ package com.arcmishler.airqualityapp.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcmishler.airqualityapp.api.AirPollutionAPIService
 import com.arcmishler.airqualityapp.api.AirQualityAPIService
-import com.arcmishler.airqualityapp.api.AqiAPIService
 import com.arcmishler.airqualityapp.api.GeoCodingAPIService
-import com.arcmishler.airqualityapp.model.AirPollutionResponse
-import com.arcmishler.airqualityapp.model.AirQuality
 import com.arcmishler.airqualityapp.model.AirQualityResponse
-import com.arcmishler.airqualityapp.model.AqiResponse
 import com.arcmishler.airqualityapp.model.GeoCodeResponse
 import com.arcmishler.airqualityapp.model.Pollutant
-import com.arcmishler.airqualityapp.model.PollutantRanges
 import com.arcmishler.airqualityapp.model.PollutantType
-import com.arcmishler.airqualityapp.model.filterComponents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,9 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AirQualityViewModel @Inject constructor(
-    private val airPollutionApi: AirPollutionAPIService,
     private val geoCodingApi: GeoCodingAPIService,
-    private val aqiAPI: AqiAPIService,
     private val airQualityAPI: AirQualityAPIService
 ) : ViewModel() {
     private val apiKey = "db36d01a9dda35a2c53e8caf78476bef"

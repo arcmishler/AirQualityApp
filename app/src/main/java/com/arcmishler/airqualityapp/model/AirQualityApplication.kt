@@ -9,7 +9,6 @@ class AirQualityApplication: Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val airPollutionAPIService = APIClient.createAirPollutionAPIService(applicationContext)
         val geoCodingAPIService = APIClient.createGeoCodingAPIService(applicationContext)
         val airQualityAPIService = APIClient.createAirQualityAPIService(applicationContext)
     }

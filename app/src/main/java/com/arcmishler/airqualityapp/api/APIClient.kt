@@ -13,19 +13,6 @@ object APIClient {
     private const val BASE_URL_NINJA = "https://api.api-ninjas.com/"
     private const val CACHE_SIZE = 10 * 1024 * 1024
 
-    fun createAirPollutionAPIService(applicationContext: Context): AirPollutionAPIService {
-        val okHttpClient = OkHttpClient.Builder()
-            .cache(createCache(applicationContext))
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL_OWM)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(AirPollutionAPIService::class.java)
-    }
-
     fun createGeoCodingAPIService(applicationContext: Context): GeoCodingAPIService {
         val okHttpClient = OkHttpClient.Builder()
             .cache(createCache(applicationContext))
