@@ -31,6 +31,10 @@ class AirQualityViewModel @Inject constructor(
     private var _geoCodeData = MutableStateFlow<GeoCodeResponse?>(null)
     val geoCodeData: StateFlow<GeoCodeResponse?> = _geoCodeData
 
+    fun isValidZip(zip: String): Boolean {
+        return zip.matches(Regex("^\\d{5}$"))
+    }
+
     fun searchWithGeoCode(zip: String) {
         viewModelScope.launch {
             try {

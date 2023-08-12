@@ -38,6 +38,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -55,6 +57,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
@@ -102,6 +105,7 @@ fun AirScreen(
     viewModel: AirQualityViewModel
 ) {
     var active by remember { mutableStateOf(false) }
+    var zipError by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -116,9 +120,10 @@ fun AirScreen(
                 onQueryChange = { onSearchTextChange(it) },
                 onSearch = {
                     active = false
-                    if (searchText.isNotEmpty()) {
-                        // TODO: Input validation
+                    if (viewModel.isValidZip(searchText)) {
                         viewModel.searchWithGeoCode(searchText)
+                    } else {
+                        zipError = true
                     }
                 },
                 active = active, onActiveChange = { active = it },
@@ -141,12 +146,21 @@ fun AirScreen(
                 }
             ) {
             }
+            if (zipError) {
+                // Display error text
+                Text(
+                    text = stringResource(R.string.zip_error_response),
+                    color = Color.Red,
+                    fontStyle = FontStyle.Italic)
+            }
             if (pollutants == null) {
                 EmptyAirQuality()
             } else {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    zipError = false
+                    // Display all AQI information
                     AQIDisplay(airQuality)
                     Spacer(modifier = Modifier.height(4.dp))
                     LocationHeader(gcData?.name)
@@ -212,10 +226,12 @@ fun LocationHeader(location: String?) {
             .widthIn(max = 300.dp)
             .padding(top = 8.dp, bottom = 8.dp, start = 40.dp, end = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Air quality in...",
+            Text(
+                text = stringResource(R.string.air_quality_in),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.White)
-            Text(location ?: stringResource(R.string.awaiting_location),
+            Text(
+                text = location ?: stringResource(R.string.awaiting_location),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White)
@@ -231,8 +247,7 @@ fun EmptyAirQuality() {
     ) {
         Text(modifier = Modifier
             .align(Alignment.Center),
-            text = stringResource(R.string.no_data_available)
-                    )
+            text = stringResource(R.string.no_data_available))
     }
 }
 
@@ -251,9 +266,9 @@ fun AQIText(aqi: String) {
 @Composable
 fun AQIColorChart() {
     val colors: List<Color> = listOf(AirGreen, AirYellow, AirOrange, AirRed, AirPurple, AirMaroon)
-
     Canvas(modifier = Modifier
         .size(150.dp), onDraw = {
+        // For each color, create its slice of the meter
         for ((i, color) in colors.withIndex()) {
             val sweepAngle = 45f
             val startAngle = (135 + (i * sweepAngle))
@@ -273,14 +288,17 @@ fun AQIGauge(aqi: Int?, viewModel: AirQualityViewModel = viewModel()) {
     Canvas(modifier = Modifier
         .size(150.dp), onDraw = {
         val aqiArc = viewModel.calculateAQIGaugeAngle(aqi)
+        // Create start and end points for gauge needle
         val pointA = Offset(size.width / 5, size.height / 2)
         val pointB = Offset(0f, size.height / 2)
+        // Surrounds the AQI text
         drawCircle(
             radius = 120f,
             color = Color.Black,
             style = Stroke(15f)
         )
         rotate(aqiArc - 45f) {
+            // Needle
             drawLine(
                 color = Color.Black,
                 strokeWidth = 15f,
@@ -289,37 +307,6 @@ fun AQIGauge(aqi: Int?, viewModel: AirQualityViewModel = viewModel()) {
                 end = pointB)
         }
     })
-}
-
-//@Preview
-//@Composable
-//fun LocationHeaderPreview() {
-//    LocationHeader(location = "Salt Lake City")
-//}
-//
-//@Preview
-//@Composable
-//fun AQIMeterPreview() {
-//    val aqi: Int = 150
-//    AQIGauge(aqi)
-//}
-//
-//@Preview
-//@Composable
-//fun AQIPreview() {
-//    val aqi: Int = 150
-//    AQIColorChart(aqi)
-//}
-fun getAQIColor(aqi: Int?): Color {
-    return when (aqi) {
-        in 0..50 -> AirGreen
-        in 51..100 -> AirYellow
-        in 101..150 -> AirOrange
-        in 151..200 -> AirRed
-        in 201..300 -> AirPurple
-        in 301..500 -> AirMaroon
-        else -> {Color.Black}
-    }
 }
 
 @Composable
@@ -336,6 +323,7 @@ fun AirQualityCard(pollutant: Pollutant) {
         colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
         border = BorderStroke(5.dp, pollutant.color),
         elevation = CardDefaults.cardElevation(10.dp)) {
+
         Column(
             modifier = Modifier
                 .padding(1.dp)
@@ -344,6 +332,7 @@ fun AirQualityCard(pollutant: Pollutant) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.aligned(Alignment.CenterVertically)
         ) {
+            // Add subtext to PM pollutants
             when (pollutant.type) {
                 PollutantType.PM25 -> {
                     Text(fontSize = 22.sp,
@@ -382,18 +371,3 @@ fun AirQualityCard(pollutant: Pollutant) {
         }
     }
 }
-
-fun parseSearch(text: String): List<String> {
-    return text.trim().split(",")
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun AirQualityCardPreview() {
-//    val fakePollutant = Pollutant(
-//        PollutantType.PM2_5, 45.toDouble()
-//    )
-//    AirQualityAppTheme {
-//        AirQualityCard(fakePollutant)
-//    }
-//}
