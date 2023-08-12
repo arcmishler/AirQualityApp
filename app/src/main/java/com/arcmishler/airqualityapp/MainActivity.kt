@@ -117,7 +117,7 @@ fun AirScreen(
                     active = false
                     if (searchText.isNotEmpty()) {
                         // TODO: Input validation
-                        viewModel.fetchGeoCode(searchText)
+                        viewModel.searchWithGeoCode(searchText)
                     }
                 },
                 active = active, onActiveChange = { active = it },
@@ -181,7 +181,7 @@ fun AQIDisplay(airQuality: Int?) {
         contentAlignment = Alignment.Center,
     ) {
         AQIColorChart()
-        AQIGauge(airQuality)
+        AQIGauge(airQuality,)
         AQIText(airQuality.toString())
     }
 }
@@ -270,19 +270,12 @@ fun AQIColorChart() {
 }
 
 @Composable
-fun AQIGauge(aqi: Int?) {
-    var aqiArc: Float = 0f
+fun AQIGauge(aqi: Int?, viewModel: AirQualityViewModel = viewModel()) {
     Canvas(modifier = Modifier
         .size(150.dp), onDraw = {
+        val aqiArc = viewModel.calculateAQIGaugeAngle(aqi)
         val pointA = Offset(size.width / 5, size.height / 2)
         val pointB = Offset(0f, size.height / 2)
-        if (aqi != null && aqi >= 300 ) {
-            aqiArc = (aqi - 300) * (45f/200) + 225
-        } else if (aqi != null && aqi >= 200) {
-            aqiArc = (aqi -200) * (45f/100) + 180
-        } else if (aqi != null) {
-            aqiArc = aqi * (180f/200)
-        }
         drawCircle(
             radius = 120f,
             color = Color.Black,
