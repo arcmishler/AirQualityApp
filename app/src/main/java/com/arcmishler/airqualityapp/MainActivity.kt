@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -122,7 +123,7 @@ fun AirScreen(
                 },
                 active = active, onActiveChange = { active = it },
                 placeholder = {
-                    Text("Enter zipcode")
+                    Text(stringResource(R.string.enter_zipcode))
                 },
                 leadingIcon = {
                     Icon(imageVector = Icons.Default.Search, contentDescription = "Search icon")
@@ -199,6 +200,7 @@ fun PollutantGrid(pollutants: List<Pollutant>) {
         }
     }
 }
+
 @Composable
 fun LocationHeader(location: String?) {
     Card(modifier = Modifier,
@@ -213,7 +215,7 @@ fun LocationHeader(location: String?) {
             Text("Air quality in...",
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.White)
-            Text(location ?: "Awaiting location",
+            Text(location ?: stringResource(R.string.awaiting_location),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White)
@@ -229,8 +231,8 @@ fun EmptyAirQuality() {
     ) {
         Text(modifier = Modifier
             .align(Alignment.Center),
-            text = "No air quality data available.\n" +
-                "Try searching for your location.")
+            text = stringResource(R.string.no_data_available)
+                    )
     }
 }
 
@@ -241,7 +243,7 @@ fun AQIText(aqi: String) {
         verticalArrangement = Arrangement.spacedBy((-8).dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("AQI", fontSize = 22.sp)
+        Text(stringResource(R.string.aqi), fontSize = 22.sp)
         Text(aqi, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
     }
 }
@@ -263,10 +265,7 @@ fun AQIColorChart() {
                 style = Stroke(75f)
             )
         }
-
-
     })
-
 }
 
 @Composable
@@ -350,9 +349,9 @@ fun AirQualityCard(pollutant: Pollutant) {
                     Text(fontSize = 22.sp,
                         color = Color.White,
                         text = buildAnnotatedString {
-                            append("PM")
+                            append(stringResource(R.string.pm))
                             withStyle(subscript) {
-                                append("2.5")
+                                append(stringResource(R.string._2_5))
                             }
                         })
                 }
@@ -360,9 +359,9 @@ fun AirQualityCard(pollutant: Pollutant) {
                     Text(fontSize = 22.sp,
                         color = Color.White,
                         text = buildAnnotatedString {
-                            append("PM")
+                            append(stringResource(R.string.pm))
                             withStyle(subscript) {
-                                append("10")
+                                append(stringResource(R.string._10))
                             }
                         })
                 }

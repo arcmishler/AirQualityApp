@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">AirQualityApp</string>
+    <string name="enter_zipcode">Enter zipcode</string>
+    <string name="awaiting_location">Awaiting location</string>
+    <string name="no_data_available">No air quality data available.\nTry searching for your location.</string>
+    <string name="aqi">AQI</string>
+    <string name="pm">PM</string>
+    <string name="_2_5">2.5</string>
+    <string name="_10">10</string>
 </resources>
