@@ -1,5 +1,6 @@
 package com.arcmishler.airqualityapp.model
 
+import androidx.room.Room
 import com.arcmishler.airqualityapp.api.AirQualityAPIService
 import com.arcmishler.airqualityapp.api.GeoCodingAPIService
 import dagger.Module
@@ -10,6 +11,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
