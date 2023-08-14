@@ -2,7 +2,7 @@ package com.arcmishler.airqualityapp.view
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,9 +56,8 @@ fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
     var zipError by remember { mutableStateOf(false) }
     var active by remember { mutableStateOf(false) }
 
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween
     ) {
         TabRow(
             selectedTabIndex = selectedIndex,
@@ -80,13 +79,23 @@ fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
 
         Column(
             modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (zipError) {
+                // Display error text
+                Text(
+                    text = stringResource(R.string.zip_error_response),
+                    color = Color.Red,
+                    fontStyle = FontStyle.Italic
+                )
+            }
+
             SearchBar(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 query = searchText,
                 onQueryChange = { setSearchText(it) },
                 onSearch = {
@@ -117,14 +126,6 @@ fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
                     }
                 }
             ) {
-            }
-            if (zipError) {
-                // Display error text
-                Text(
-                    text = stringResource(R.string.zip_error_response),
-                    color = Color.Red,
-                    fontStyle = FontStyle.Italic
-                )
             }
         }
     }

@@ -1,12 +1,9 @@
 package com.arcmishler.airqualityapp.viewmodel
 
 import android.util.Log
-import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcmishler.airqualityapp.api.AirQualityAPIService
-import com.arcmishler.airqualityapp.api.GeoCodingAPIService
-import com.arcmishler.airqualityapp.model.AirQualityResponse
+import com.arcmishler.airqualityapp.model.AQI
 import com.arcmishler.airqualityapp.model.GeoCodeResponse
 import com.arcmishler.airqualityapp.model.Pollutant
 import com.arcmishler.airqualityapp.model.PollutantType
@@ -25,8 +22,8 @@ class AirQualityViewModel @Inject constructor(
     private var _pollutantList = MutableStateFlow<List<Pollutant>?>(null)
     val pollutantList: StateFlow<List<Pollutant>?> = _pollutantList
 
-    private var _aqiData = MutableStateFlow<Int?>(null)
-    val aqiData: StateFlow<Int?> = _aqiData
+    private var _aqiData = MutableStateFlow<AQI?>(null)
+    val aqiData: StateFlow<AQI?> = _aqiData
 
     private var _geoCodeData = MutableStateFlow<GeoCodeResponse?>(null)
     val geoCodeData: StateFlow<GeoCodeResponse?> = _geoCodeData
@@ -55,7 +52,7 @@ class AirQualityViewModel @Inject constructor(
                 val airQualityResponse = airQualityRepository.getAirQuality(lat, lon)
                 airQualityResponse?.let {
                 // Extract overall AQI from the response
-                val overallAqi = it.overallAqi
+                val overallAqi = AQI.make(it.overallAqi)
 
                 // Create a list of pollutants using the AQI data
                     val pollutants = listOf(

@@ -1,5 +1,8 @@
 package com.arcmishler.airqualityapp.view
+import android.media.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,11 +30,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arcmishler.airqualityapp.R
+import com.arcmishler.airqualityapp.model.AQI
+import com.arcmishler.airqualityapp.ui.theme.AirBlue
 import com.arcmishler.airqualityapp.ui.theme.AirGreen
 import com.arcmishler.airqualityapp.ui.theme.AirMaroon
 import com.arcmishler.airqualityapp.ui.theme.AirOrange
@@ -42,16 +49,16 @@ import com.arcmishler.airqualityapp.viewmodel.AirQualityViewModel
 
 @Composable
 fun AQIScreen(viewModel: AirQualityViewModel) {
-    val airQuality by viewModel.aqiData.collectAsState()
+    val aqi by viewModel.aqiData.collectAsState()
     val gcData by viewModel.geoCodeData.collectAsState()
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (airQuality == null) {
+        if (aqi == null) {
             EmptyAirQuality()
         } else {
             Column(
@@ -59,16 +66,17 @@ fun AQIScreen(viewModel: AirQualityViewModel) {
                 verticalArrangement = Arrangement.Top
             ) {
                 // Display all AQI information
-                LocationHeader(gcData?.name)
+                LocationHeader(gcData?.name, aqi)
                 Spacer(modifier = Modifier.height(10.dp))
-                AQIDisplay(airQuality, viewModel)
+                AQIDisplay(aqi, viewModel)
+                AQIDetails(aqi)
             }
         }
     }
 }
 
 @Composable
-fun AQIDisplay(airQuality: Int?, viewModel: AirQualityViewModel) {
+fun AQIDisplay(aqi: AQI?, viewModel: AirQualityViewModel) {
     Box(modifier = Modifier
         .height(160.dp)
         .offset(y = 10.dp)
@@ -76,21 +84,24 @@ fun AQIDisplay(airQuality: Int?, viewModel: AirQualityViewModel) {
         contentAlignment = Alignment.Center,
     ) {
         AQIColorChart()
-        AQIGauge(airQuality, viewModel)
-        AQIText(airQuality.toString())
+        AQIGauge(aqi, viewModel)
+        AQIText(aqi?.value.toString())
+
     }
 }
 
 @Composable
-fun LocationHeader(location: String?) {
-    Card(modifier = Modifier,
-        shape = RoundedCornerShape(35.dp),
+fun LocationHeader(location: String?, aqi: AQI?) {
+    Card(modifier = Modifier
+        .padding(8.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
-        elevation = CardDefaults.cardElevation(10.dp)
+        elevation = CardDefaults.cardElevation(10.dp),
+        border = BorderStroke(5.dp, aqi?.details!!.color)
     ) {
         Column(modifier = Modifier
             .widthIn(max = 300.dp)
-            .padding(top = 8.dp, bottom = 8.dp, start = 40.dp, end = 40.dp),
+            .padding(top = 16.dp, bottom = 16.dp, start = 55.dp, end = 55.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.air_quality_in),
@@ -117,6 +128,50 @@ fun EmptyAirQuality() {
     }
 }
 
+@Composable
+fun AQIDetails(aqi: AQI?) {
+    Column(
+        modifier = Modifier
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+        ) {
+            Image(
+                painterResource(aqi?.details!!.image),
+                contentDescription = aqi.details.description
+            )
+        }
+        InformationCard(aqi)
+    }
+}
+
+@Composable
+fun InformationCard(aqi: AQI?) {
+        Card(
+            modifier = Modifier
+                .padding(start = 26.dp, end = 24.dp, top = 8.dp, bottom = 8.dp),
+            shape = RoundedCornerShape(25.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+        ) {
+            Column () {
+                Text(
+                    modifier = Modifier
+                        .padding(24.dp),
+                    text = aqi?.details!!.detail1,
+                    color = Color.White
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(24.dp),
+                    text = aqi.details.detail2,
+                    color = Color.White
+                )
+            }
+
+        }
+}
 @Composable
 fun AQIText(aqi: String) {
     Column(modifier = Modifier
@@ -150,10 +205,10 @@ fun AQIColorChart() {
 }
 
 @Composable
-fun AQIGauge(aqi: Int?, viewModel: AirQualityViewModel) {
+fun AQIGauge(aqi: AQI?, viewModel: AirQualityViewModel) {
     Canvas(modifier = Modifier
         .size(150.dp), onDraw = {
-        val aqiArc = viewModel.calculateAQIGaugeAngle(aqi)
+        val aqiArc = viewModel.calculateAQIGaugeAngle(aqi?.value)
         // Create start and end points for gauge needle
         val pointA = Offset(size.width / 5, size.height / 2)
         val pointB = Offset(0f, size.height / 2)
