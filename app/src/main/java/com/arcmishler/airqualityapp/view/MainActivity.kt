@@ -82,7 +82,8 @@ fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom
         ) {
             SearchBar(
                 modifier = Modifier.fillMaxWidth(),

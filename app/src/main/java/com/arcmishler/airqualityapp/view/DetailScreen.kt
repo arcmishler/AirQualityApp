@@ -93,6 +93,7 @@ fun AirQualityCard(pollutant: Pollutant) {
         border = BorderStroke(5.dp, pollutant.color),
         elevation = CardDefaults.cardElevation(10.dp)) {
 
+        // Stack the pollutant name above the value
         Column(
             modifier = Modifier
                 .padding(1.dp)
@@ -101,36 +102,16 @@ fun AirQualityCard(pollutant: Pollutant) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.aligned(Alignment.CenterVertically)
         ) {
-            // Add subtext to PM pollutants
-            when (pollutant.type) {
-                PollutantType.PM25 -> {
-                    Text(fontSize = 22.sp,
-                        color = Color.White,
-                        text = buildAnnotatedString {
-                            append(stringResource(R.string.pm))
-                            withStyle(subscript) {
-                                append(stringResource(R.string._2_5))
-                            }
-                        })
+            // Add subtext to pollutants
+            Text(fontSize = 22.sp,
+                color = Color.White,
+                text = buildAnnotatedString {
+                    append(pollutant.name)
+                    withStyle(subscript) {
+                        append(pollutant.subscript)
+                    }
                 }
-                PollutantType.PM10 -> {
-                    Text(fontSize = 22.sp,
-                        color = Color.White,
-                        text = buildAnnotatedString {
-                            append(stringResource(R.string.pm))
-                            withStyle(subscript) {
-                                append(stringResource(R.string._10))
-                            }
-                        })
-                }
-                else -> {
-                    Text(
-                        pollutant.type.toString(),
-                        fontSize = 22.sp,
-                        color = Color.White
-                    )
-                }
-            }
+            )
             Spacer(Modifier.height(0.dp))
             Text(
                 "${pollutant.value}",

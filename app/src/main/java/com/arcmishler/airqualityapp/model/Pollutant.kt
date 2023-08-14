@@ -29,7 +29,9 @@ data class PollutantRanges (
 
 data class Pollutant(
     val type: PollutantType,
-    val value: Double
+    val value: Double,
+    val name: String,
+    val subscript: String
 ) {
     val color: Color
         get() = getAQIColor(type.ranges, value)

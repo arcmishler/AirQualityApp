@@ -58,16 +58,15 @@ class AirQualityViewModel @Inject constructor(
                 val overallAqi = it.overallAqi
 
                 // Create a list of pollutants using the AQI data
-                val pollutants = listOf(
-                    Pollutant(PollutantType.CO, it.co.concentration),
-                    Pollutant(PollutantType.NO2, it.no2.concentration),
-                    Pollutant(PollutantType.O3, it.o3.concentration),
-                    Pollutant(PollutantType.SO2, it.so2.concentration),
-                    Pollutant(PollutantType.PM25, it.pm25.concentration),
-                    Pollutant(PollutantType.PM10, it.pm10.concentration)
-                )
+                    val pollutants = listOf(
+                        Pollutant(PollutantType.CO, it.co.concentration, name = "CO", subscript = ""),
+                        Pollutant(PollutantType.NO2, it.no2.concentration, name = "NO", subscript = "2"),
+                        Pollutant(PollutantType.O3, it.o3.concentration, name = "O", subscript = "3"),
+                        Pollutant(PollutantType.SO2, it.so2.concentration, name = "SO", subscript = "2"),
+                        Pollutant(PollutantType.PM25, it.pm25.concentration, name = "PM", subscript = "2.5"),
+                        Pollutant(PollutantType.PM10, it.pm10.concentration, name = "PM", subscript = "10")
+                    )
 
-                // Now, you can use the overall AQI and the list of pollutants as needed
                 _pollutantList.value = pollutants
                 _aqiData.value = overallAqi
                 }
