@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcmishler.airqualityapp.model.AQI
+import com.arcmishler.airqualityapp.model.AirQualityResponse
 import com.arcmishler.airqualityapp.model.GeoCodeResponse
 import com.arcmishler.airqualityapp.model.Pollutant
 import com.arcmishler.airqualityapp.model.PollutantType
@@ -53,16 +54,8 @@ class AirQualityViewModel @Inject constructor(
                 airQualityResponse?.let {
                 // Extract overall AQI from the response
                 val overallAqi = AQI.make(it.overallAqi)
-
                 // Create a list of pollutants using the AQI data
-                    val pollutants = listOf(
-                        Pollutant(PollutantType.CO, it.co.concentration, name = "CO", subscript = ""),
-                        Pollutant(PollutantType.NO2, it.no2.concentration, name = "NO", subscript = "2"),
-                        Pollutant(PollutantType.O3, it.o3.concentration, name = "O", subscript = "3"),
-                        Pollutant(PollutantType.SO2, it.so2.concentration, name = "SO", subscript = "2"),
-                        Pollutant(PollutantType.PM25, it.pm25.concentration, name = "PM", subscript = "2.5"),
-                        Pollutant(PollutantType.PM10, it.pm10.concentration, name = "PM", subscript = "10")
-                    )
+                val pollutants = makePollutantList(airQualityResponse)
 
                 _pollutantList.value = pollutants
                 _aqiData.value = overallAqi
@@ -73,6 +66,16 @@ class AirQualityViewModel @Inject constructor(
         }
     }
 
+    private fun makePollutantList(response: AirQualityResponse): List<Pollutant> {
+        return listOf(
+            Pollutant(PollutantType.CO, response.co.concentration, name = "CO", subscript = ""),
+            Pollutant(PollutantType.NO2, response.no2.concentration, name = "NO", subscript = "2"),
+            Pollutant(PollutantType.O3, response.o3.concentration, name = "O", subscript = "3"),
+            Pollutant(PollutantType.SO2, response.so2.concentration, name = "SO", subscript = "2"),
+            Pollutant(PollutantType.PM25, response.pm25.concentration, name = "PM", subscript = "2.5"),
+            Pollutant(PollutantType.PM10, response.pm10.concentration, name = "PM", subscript = "10")
+        )
+    }
     fun calculateAQIGaugeAngle(aqi: Int?): Float {
         var aqiArc: Float = 0f
         if (aqi != null && aqi >= 300 ) {
