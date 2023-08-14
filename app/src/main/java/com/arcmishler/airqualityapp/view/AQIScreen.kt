@@ -51,6 +51,7 @@ import com.arcmishler.airqualityapp.viewmodel.AirQualityViewModel
 fun AQIScreen(viewModel: AirQualityViewModel) {
     val aqi by viewModel.aqiData.collectAsState()
     val gcData by viewModel.geoCodeData.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,7 +87,6 @@ fun AQIDisplay(aqi: AQI?, viewModel: AirQualityViewModel) {
         AQIColorChart()
         AQIGauge(aqi, viewModel)
         AQIText(aqi?.value.toString())
-
     }
 }
 
@@ -102,16 +102,16 @@ fun LocationHeader(location: String?, aqi: AQI?) {
         Column(modifier = Modifier
             .widthIn(max = 300.dp)
             .padding(top = 16.dp, bottom = 16.dp, start = 55.dp, end = 55.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = stringResource(R.string.air_quality_in),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White)
-            Text(
-                text = location ?: stringResource(R.string.awaiting_location),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.White)
+            horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = stringResource(R.string.air_quality_in),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White)
+                Text(
+                    text = location ?: stringResource(R.string.awaiting_location),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White)
         }
     }
 }
@@ -158,18 +158,11 @@ fun InformationCard(aqi: AQI?) {
             Column () {
                 Text(
                     modifier = Modifier
-                        .padding(24.dp),
+                        .padding(16.dp),
                     text = aqi?.details!!.detail1,
                     color = Color.White
                 )
-                Text(
-                    modifier = Modifier
-                        .padding(24.dp),
-                    text = aqi.details.detail2,
-                    color = Color.White
-                )
             }
-
         }
 }
 @Composable
