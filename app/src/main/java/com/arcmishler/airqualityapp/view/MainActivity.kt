@@ -61,13 +61,15 @@ fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
     ) {
         TabRow(
             selectedTabIndex = selectedIndex,
-            containerColor = Color.DarkGray
+            containerColor = Color.DarkGray,
         ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
                     text = { Text(title) },
                     selected = selectedIndex == index,
-                    onClick = { selectedIndex = index }
+                    onClick = { selectedIndex = index },
+                    selectedContentColor = Color.White,
+                    unselectedContentColor = Color.LightGray
                 )
             }
         }
