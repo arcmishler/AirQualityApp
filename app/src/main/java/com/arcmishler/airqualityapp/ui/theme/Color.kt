@@ -16,7 +16,12 @@ val AirOrange = Color(0xFFff9222)
 val AirRed = Color(0xFFe23f38)
 val AirPurple = Color(0xFFb96fdc)
 val AirMaroon = Color(0xFF7e2f4f)
+
 val AirBlue = Color(0xFF0080BF)
+val DimBlue = Color(0xFF115B82)
+val DarkBlue = Color(0xFF002977)
+val LightBlue = Color(0xFFCBD9E0)
+val BackgroundBlue = Color(0xFFD3F0FF)
 
 val Green = Color(0xff00e600)
 val Yellow = Color(0xfffffb00)

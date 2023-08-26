@@ -8,12 +8,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Storm
+import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarColors
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -50,7 +55,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
 ) {
-    val tabs = listOf("AQI", "Details")
+    val tabs = listOf("Air Quality", "Pollutants")
     var selectedIndex by remember { mutableStateOf(0) }
     val (searchText, setSearchText) = remember { mutableStateOf("") }
     var zipError by remember { mutableStateOf(false) }
@@ -61,11 +66,17 @@ fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
     ) {
         TabRow(
             selectedTabIndex = selectedIndex,
-            containerColor = Color.DarkGray,
+            containerColor = AirBlue,
         ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
                     text = { Text(title) },
+                    icon = {
+                        when (index)  {
+                            0 -> Icon(Icons.Default.Air, "Air quality")
+                            1 -> Icon(Icons.Outlined.Storm, "Pollutants")
+                        }
+                    },
                     selected = selectedIndex == index,
                     onClick = { selectedIndex = index },
                     selectedContentColor = Color.White,
@@ -83,7 +94,7 @@ fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(16.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (zipError) {
@@ -95,9 +106,10 @@ fun AirQualityApp(viewModel: AirQualityViewModel = viewModel()
                 )
             }
 
-            SearchBar(
+            DockedSearchBar(
                 modifier = Modifier
                     .fillMaxWidth(),
+                colors = SearchBarDefaults.colors(containerColor = LightBlue),
                 query = searchText,
                 onQueryChange = { setSearchText(it) },
                 onSearch = {

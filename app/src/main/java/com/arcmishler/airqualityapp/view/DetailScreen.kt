@@ -1,7 +1,9 @@
 package com.arcmishler.airqualityapp.view
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +27,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +36,9 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arcmishler.airqualityapp.R
 import com.arcmishler.airqualityapp.model.Pollutant
+import com.arcmishler.airqualityapp.ui.theme.DimBlue
 import com.arcmishler.airqualityapp.viewmodel.AirQualityViewModel
 
 @Composable
@@ -40,23 +46,33 @@ fun DetailScreen(viewModel: AirQualityViewModel) {
     val pollutants by viewModel.pollutantList.collectAsState()
     val gcData by viewModel.geoCodeData.collectAsState()
     val aqi by viewModel.aqiData.collectAsState()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+
+    Box(modifier = Modifier,
+        contentAlignment = Alignment.BottomCenter
     ) {
-        if (pollutants == null) {
-            EmptyAirQuality()
-        } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                // Display all AQI information
-                LocationHeader(gcData?.name, aqi)
-                PollutantGrid(pollutants!!)
+        Image(
+            painter = painterResource(id = R.drawable.city_background_4),
+            contentDescription = "Location",
+            contentScale = ContentScale.FillWidth
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (pollutants == null) {
+                EmptyAirQuality()
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    // Display all AQI information
+                    LocationHeader(gcData?.name, aqi)
+                    PollutantGrid(pollutants!!)
+                }
             }
         }
     }
@@ -87,7 +103,7 @@ fun AirQualityCard(pollutant: Pollutant) {
             .padding(8.dp)
             .wrapContentSize(),
         shape = RoundedCornerShape(35.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+        colors = CardDefaults.cardColors(containerColor = DimBlue),
         border = BorderStroke(5.dp, pollutant.color),
         elevation = CardDefaults.cardElevation(10.dp)) {
 
